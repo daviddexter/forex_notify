@@ -5,6 +5,7 @@ use std::process;
 use std::thread;
 use std::time::Duration;
 use std::{fs::create_dir, fs::File, io::Write, path::PathBuf};
+use url::Url;
 
 extern crate job_scheduler;
 use job_scheduler::{Job, JobScheduler};
@@ -103,11 +104,16 @@ fn listen(p: PathBuf) {
     let mut sched = JobScheduler::new();
 
     sched.add(Job::new(tick.parse().unwrap(), || {
-        // let resp =
-        //     reqwest::blocking::get("https://httpbin.org/ip")?.json::<HashMap<String, String>>()?;
-        // println!("{:#?}", resp);
+        // https://www.freeforexapi.com/api/live?pairs=USDKES
 
-        let resp = reqwest::blocking::get("https://httpbin.org/ip").expect("");
+        let url = format!(
+            "https://www.freeforexapi.com/api/live?pairs={}{}",
+            config.major_currency, config.minor_currency
+        );
+
+        let u = Url::parse(&url).expect("failed to parse url");
+
+        let resp = reqwest::blocking::get(u).expect("");
         println!("{:?}", resp);
     }));
 
