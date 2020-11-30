@@ -1,3 +1,3 @@
 # Forex notify
 
-http https://www.freeforexapi.com/api/live?pairs=USDKES
+Runs a background job every `x` hours to get forex exchange status.
