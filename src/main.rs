@@ -51,14 +51,14 @@ fn create_defualt_config(p: PathBuf) {
         r#"
         major_currency = 'USD'
         minor_currency = 'KES'
-        poll_frequency = 2        
+        poll_frequency = 1      
     "#,
     )
     .unwrap();
 
     assert_eq!(config.major_currency, "USD");
     assert_eq!(config.minor_currency, "KES");
-    assert_eq!(config.poll_frequency, 2);
+    assert_eq!(config.poll_frequency, 1);
 
     println!("{:?}", p);
 
@@ -77,7 +77,7 @@ fn create_defualt_config(p: PathBuf) {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct ApiResp {
-    code: String,
+    code: u32,
     rate: String,
 }
 
@@ -99,11 +99,13 @@ fn listen(p: PathBuf) {
         process::exit(0);
     }
 
-    let tick = format!("0 */{} * * * *", config.poll_frequency);
-
     let mut sched = JobScheduler::new();
 
-    sched.add(Job::new(tick.parse().unwrap(), || {
+    //let tick = format!("0 0 1/{} * * * *", config.poll_frequency).parse();
+
+    let tick = "1/10 * * * * * *".parse();
+
+    sched.add(Job::new(tick.unwrap(), || {
         // https://www.freeforexapi.com/api/live?pairs=USDKES
 
         let url = format!(
@@ -113,8 +115,17 @@ fn listen(p: PathBuf) {
 
         let u = Url::parse(&url).expect("failed to parse url");
 
-        let resp = reqwest::blocking::get(u).expect("");
+        let resp = reqwest::blocking::get(u).expect("failed read http response");
         println!("{:?}", resp);
+
+        let res: ApiResp = resp.json().expect("failed to read as json");
+
+        // resp.read_to_string(&mut body)
+        //     .expect("error while reading response");
+
+        // let res: ApiResp = serde_json::from_str(&body).unwrap();
+
+        println!("forex exchange = {:?}", res);
     }));
 
     loop {
