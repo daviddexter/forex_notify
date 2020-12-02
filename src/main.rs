@@ -75,12 +75,6 @@ fn create_defualt_config(p: PathBuf) {
     listen(org);
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct ApiResp {
-    code: u32,
-    rate: String,
-}
-
 fn listen(p: PathBuf) {
     println!("config file found at {:?}. setting up client", p);
 
@@ -115,21 +109,28 @@ fn listen(p: PathBuf) {
 
         let u = Url::parse(&url).expect("failed to parse url");
 
-        let resp = reqwest::blocking::get(u).expect("failed read http response");
+        let resp = get_data(u).unwrap();
+
         println!("{:?}", resp);
 
-        let res: ApiResp = resp.json().expect("failed to read as json");
+        let pl = resp.as_object().unwrap()["rates"].as_object().unwrap()["USDKES"]
+            .as_object()
+            .unwrap();
 
-        // resp.read_to_string(&mut body)
-        //     .expect("error while reading response");
+        println!("{:?}", pl);
 
-        // let res: ApiResp = serde_json::from_str(&body).unwrap();
+        let rate = pl["rate"].clone();
 
-        println!("forex exchange = {:?}", res);
+        println!("rate is {:?}", rate);
     }));
 
     loop {
         sched.tick();
         std::thread::sleep(Duration::from_millis(100));
     }
+}
+
+fn get_data(u: Url) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    let resp = reqwest::blocking::get(u)?.json::<serde_json::Value>()?;
+    Ok(resp)
 }
