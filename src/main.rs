@@ -91,9 +91,7 @@ fn listen(p: PathBuf) {
 
     let mut sched = JobScheduler::new();
 
-    // let tick = format!("0 0 1/{} * * * *", config.poll_frequency).parse();
-
-    let tick = "1/50 * * * * * *".parse();
+    let tick = format!("0 0 1/{} * * * *", config.poll_frequency).parse();
 
     sched.add(Job::new(tick.unwrap(), || {
         // https://www.freeforexapi.com/api/live?pairs=USDKES
