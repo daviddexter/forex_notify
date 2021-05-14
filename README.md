@@ -4,6 +4,8 @@ Simple program that runs in the background to get the latest forex exchange stat
 
 Currently it watches against `USDKES`
 
+This program was built while learning rust.
+
 ## Installation
 
 ### Create a systemd user service
@@ -37,7 +39,7 @@ Consult `cargo install` documentation for details.
 If the install path is not `/home/<your-user-name>/.cargo`, you will have to amend the file service to the path wher the binary will be located
 
 ```sh
-cargo install -v --git https://github.com/daviddexter/forex_notify.git --tag v0.0.1 forex_notify
+cargo install --git https://github.com/daviddexter/forex_notify.git --tag v0.0.1 forex_notify
 ```
 
 ### Controlling the service
