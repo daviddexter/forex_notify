@@ -1,18 +1,14 @@
-use serde::{Deserialize, Serialize};
-
 use std::io::prelude::*;
 use std::process;
 use std::thread;
 use std::time::Duration;
 use std::{fs::create_dir, fs::File, io::Write, path::PathBuf};
-use url::Url;
-
-extern crate job_scheduler;
-use job_scheduler::{Job, JobScheduler};
 
 use dirs::config_dir;
-
-extern crate reqwest;
+use job_scheduler::{Job, JobScheduler};
+use notify_rust::Notification;
+use serde::{Deserialize, Serialize};
+use url::Url;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Config {
@@ -95,9 +91,9 @@ fn listen(p: PathBuf) {
 
     let mut sched = JobScheduler::new();
 
-    //let tick = format!("0 0 1/{} * * * *", config.poll_frequency).parse();
+    // let tick = format!("0 0 1/{} * * * *", config.poll_frequency).parse();
 
-    let tick = "1/10 * * * * * *".parse();
+    let tick = "1/50 * * * * * *".parse();
 
     sched.add(Job::new(tick.unwrap(), || {
         // https://www.freeforexapi.com/api/live?pairs=USDKES
@@ -111,17 +107,19 @@ fn listen(p: PathBuf) {
 
         let resp = get_data(u).unwrap();
 
-        println!("{:?}", resp);
-
         let pl = resp.as_object().unwrap()["rates"].as_object().unwrap()["USDKES"]
             .as_object()
             .unwrap();
 
-        println!("{:?}", pl);
-
         let rate = pl["rate"].clone();
 
-        println!("rate is {:?}", rate);
+        let msg = format!("USDKES : {:?}", rate.to_string());
+
+        Notification::new()
+            .summary("Forex Notify")
+            .body(&msg)
+            .show()
+            .unwrap();
     }));
 
     loop {
