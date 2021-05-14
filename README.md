@@ -32,11 +32,11 @@ WantedBy=default.target
 
 ### Install from git
 
-Run the below command to install `forex_notify`. It will default to `/home/<your-user-name>/.cargo`
+Run the below command to install `forex_notify`. The installation path will default to `/home/<your-user-name>/.cargo`
 
-Consult `cargo install` documentation for details.
+Consult `cargo install` documentation for details
 
-If the install path is not `/home/<your-user-name>/.cargo`, you will have to amend the file service to the path wher the binary will be located
+If the installation path is not `/home/<your-user-name>/.cargo`, you will have to amend the service file to the path where the binary is located
 
 ```sh
 cargo install --git https://github.com/daviddexter/forex_notify.git --tag v0.0.1 forex_notify
