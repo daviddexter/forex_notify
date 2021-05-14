@@ -1,3 +1,0 @@
-# Forex notify
-
-Runs a background job every `x` hours to get forex exchange status.
